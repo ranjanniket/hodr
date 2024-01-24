@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log/slog"
+	"math/rand"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -37,6 +39,13 @@ func init() {
 	prometheus.MustRegister(responseStatusCounter)
 }
 
+func randomSleepDuration() time.Duration {
+	// Generate a random sleep duration between 1 to 4 seconds
+	rand.Seed(time.Now().UnixNano())
+	sleepSeconds := rand.Intn(2)
+	return time.Duration(sleepSeconds) * time.Second
+}
+
 func handler(w http.ResponseWriter, r *http.Request) {
 	// Increment request method and path counter
 	requestMethodCounter.WithLabelValues(r.Method, r.URL.Path).Inc()
@@ -49,6 +58,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet, http.MethodPost:
 		// Respond with "Hodor" for both GET and POST requests
+		time.Sleep(randomSleepDuration())
 		fmt.Fprint(w, "hodor... hodor... hodor")
 	default:
 		// Respond with a 405 Method Not Allowed for other request methods
@@ -63,10 +73,15 @@ func main() {
 	// Register Prometheus endpoint
 	http.Handle("/metrics", promhttp.Handler())
 
+	addr := os.Getenv("HOST_ADDR")
+	if addr == "" {
+		addr = "localhost:8080"
+	}
+
 	// Start the server on port 8080
-	log.Info("Server is running on http://localhost:8080")
-	err := http.ListenAndServe("localhost:8080", nil)
+	log.Info("Staring server", "addr", addr)
+	err := http.ListenAndServe(addr, nil)
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Info("Failed to start", "err", err)
 	}
 }
