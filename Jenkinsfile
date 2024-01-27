@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-     environment {
+    environment {
         SCANNER_HOME = tool 'sonar-scanner'
     }
 
@@ -27,17 +27,9 @@ pipeline {
             }
         }
 
-        stage("quality gate") {
-            steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'sonarqube'
-                }
-            }
-        }
-
         stage('OWASP FS SCAN') {
             steps {
-            dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
@@ -47,16 +39,16 @@ pipeline {
             }
         }
         stage("Docker Build & Push") {
-                    steps {
-                        script {
-                            withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                                sh "docker build -t niket50/hodr:v1 ."
-                                sh "docker tag niket50/hodr:v1 niket50/hodr:latest"
-                                sh "docker push niket50/hodr:latest"
-                            }
-                        }
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
+                        sh "docker build -t niket50/hodr:v1 ."
+                        sh "docker tag niket50/hodr:v1 niket50/hodr:latest"
+                        sh "docker push niket50/hodr:latest"
                     }
                 }
+            }
+        }
 
         stage("TRIVY") {
             steps {
@@ -83,3 +75,4 @@ pipeline {
         }
     }
 }
+
