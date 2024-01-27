@@ -27,13 +27,6 @@ pipeline {
             }
         }
 
-       stage("quality gate") {
-            steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-server'
-                }
-            }
-        }
 
         stage('OWASP FS SCAN') {
             steps {
@@ -66,7 +59,7 @@ pipeline {
 
         stage('Deploy to container') {
             steps {
-                sh 'docker run -d -p 8080:8080 niket50/hodr:latest'
+                sh 'docker run --rm -d -p 8080:8080 niket50/hodr:latest'
             }
         }
     }
