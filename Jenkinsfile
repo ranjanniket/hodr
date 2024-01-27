@@ -12,18 +12,17 @@ pipeline {
             }
         }
 
-        stage('Checkout from Git') {
-            steps {
-                git branch: 'main', url: 'https://github.com/ranjanniket/hodr.git'
+        node {
+            stage('SCM') {
+                checkout scm
             }
-        }
-
-       stage('SonarQube Analysis') {
-            def scannerHome = tool 'SonarScanner';
-            withSonarQubeEnv() {
-            sh "${scannerHome}/bin/sonar-scanner"
+            stage('SonarQube Analysis') {
+                def scannerHome = tool 'SonarScanner';
+                withSonarQubeEnv() {
+                sh "${scannerHome}/bin/sonar-scanner"
+                }
             }
-        }
+            }
 
 
         stage('OWASP FS SCAN') {
