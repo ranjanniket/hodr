@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Hello from Jenkins') {
             steps {
-                echo 'Hello from Jenkins'
+                echo 'Hello from Jenkins, HODR'
             }
         }
     }
