@@ -12,8 +12,8 @@ pipeline {
             }
         }
 
-        node {
-            stage('SCM') {
+        
+        stage('SCM') {
                 checkout scm
             }
             stage('SonarQube Analysis') {
@@ -22,7 +22,7 @@ pipeline {
                 sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
-            }
+            
 
 
         stage('OWASP FS SCAN') {
