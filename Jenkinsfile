@@ -58,7 +58,7 @@ pipeline {
 
         stage('Deploy to container') {
             steps {
-                sh 'docker run -d -p 8080:8080 niket50/hodr:latest'
+                sh 'docker run -d -p 1234:8080 niket50/hodr:latest'
             }
         }
     }
