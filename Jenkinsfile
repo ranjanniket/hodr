@@ -1,11 +1,22 @@
 pipeline {
     agent any
     stages {
-        stage('Hello from jenkins') {
+        stage('Hello from Jenkins') {
             steps {
-                echo 'Hello from jenkins, this is niket'
+                echo 'Hello from Jenkins, this is niket'
             }
         }
-    
+    }
+    post {
+        always {
+            emailext attachLog: true,
+                subject: "'${currentBuild.result}'",
+                body: "Project: ${env.JOB_NAME}<br/>" +
+                    "Build Number: ${env.BUILD_NUMBER}<br/>" +
+                    "URL: ${env.BUILD_URL}<br/>",
+                to: 'niketranjan50@gmail.com', // Change mail here
+                attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
+        }
     }
 }
+
