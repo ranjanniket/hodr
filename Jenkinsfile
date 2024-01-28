@@ -56,6 +56,10 @@ pipeline {
                 sh "trivy image -f json -o trivyimage.txt niket50/hodr:${BUILD_NUMBER}"
             }
         }
+         stage('Trigger ManifestUpdate') {
+                echo "triggering updatemanifest hodr job"
+                build job: 'cd_hodr', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+        }
 
         
 
@@ -74,5 +78,3 @@ pipeline {
         }
 
 }
-
-
