@@ -53,29 +53,11 @@ pipeline {
 
         stage("TRIVY") {
             steps {
-                sh "trivy image -f json -o trivyimage.txt niket50/hodr:latest"
+                sh "trivy image -f json -o trivyimage.txt niket50/hodr:${BUILD_NUMBER}"
             }
         }
 
-        stage('Update the manifest file') {
-                steps {
-                    script {
-                        def newBuildNumber = "${BUILD_NUMBER}"
-
-                        git branch: 'main',
-                            credentialsId: 'ranjanniket',
-                            url: 'https://github.com/username/repository.git'
-
-                        sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${newBuildNumber}/' Kubernetes/hodr.yaml"
-
-                        gitAdd = sh(script: "git add Kubernetes/hodr.yaml", returnStatus: true)
-                        if (gitAdd == 0) {
-                            sh "git commit -m 'Update image tag to ${newBuildNumber}'"
-                            sh "git push origin main"
-                        }
-                    }
-                }
-            }
+        
 
     }
 
