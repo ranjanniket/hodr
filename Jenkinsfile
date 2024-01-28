@@ -60,7 +60,7 @@ pipeline {
         stage('Trigger ManifestUpdate') {
             steps {
                 echo "triggering updatemanifest hodr job"
-                build job: 'cd_hodr', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+                build job: "cd_hodr", parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)], wait: true
             }
         }
     }
