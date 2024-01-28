@@ -59,10 +59,10 @@ pipeline {
 
         stage('Update Deployment File') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'ranjanniket', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                    script {
-                        def gitUrl = "https://${GIT_PASSWORD}@github.com/ranjanniket/hodr_manifest.git"
+                script {
+                    def gitUrl = "git@github.com:ranjanniket/bran_manifest.git"
 
+                    sshagent(credentials: ['niket-github']) {
                         sh "git config user.email 'niketranjn50@gmail.com'"
                         sh "git config user.name 'ranjanniket'"
 
@@ -90,3 +90,4 @@ pipeline {
             }
         }
 }
+
