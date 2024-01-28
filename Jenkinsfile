@@ -57,24 +57,25 @@ pipeline {
             }
         }
 
-        stage('Update the manifest file') {
-            steps {
-                script {
-                    def newBuildNumber = "${BUILD_NUMBER}"
+	stage('Update the manifest file') {
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'github-ci', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+            script {
+                def newBuildNumber = "${BUILD_NUMBER}"
 
-                    // Replace the image tag in hodr.yaml
-                    sh "sed -i 's/image: niket50\\/hodr:latest/image: niket50\\/hodr:${newBuildNumber}/' Kubernetes/hodr.yaml"
+                sh "sed -i 's/image: niket50\\/hodr:.*/image: niket50\\/hodr:${newBuildNumber}/' Kubernetes/hodr.yaml"
 
-                    // Commit and push the changes to Git (optional)
-                    gitAdd = sh(script: "git add Kubernetes/hodr.yaml", returnStatus: true)
-                    if (gitAdd == 0) {
-                        sh "git commit -m 'Update image tag to ${newBuildNumber}'"
-                        sh "git push origin main"
-                    }
+                gitAdd = sh(script: "git add Kubernetes/hodr.yaml", returnStatus: true)
+                if (gitAdd == 0) {
+                    sh "git commit -m 'Update image tag to ${newBuildNumber}'"
+                    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/hodr.git HEAD:main"
                 }
             }
         }
     }
+}
+
+
 
     post {
         always {
