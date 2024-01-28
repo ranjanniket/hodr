@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: hodr-container
-        image: niket50/hodr:v1
+        image: niket50/hodr:latest
         ports:
         - containerPort: 8080
