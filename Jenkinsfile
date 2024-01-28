@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-     environment {
+    environment {
         SCANNER_HOME = tool 'sonar-scanner'
     }
 
@@ -27,29 +27,29 @@ pipeline {
             }
         }
 
-
         stage('OWASP FS SCAN') {
             steps {
                 dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
+
         stage('TRIVY FS SCAN') {
             steps {
                 sh "trivy fs . > trivyfs.txt"
             }
         }
+
         stage("Docker Build & Push") {
-                    steps {
-                        script {
-                            withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                                sh "docker build -t niket50/hodr:v1 ."
-                                sh "docker tag niket50/hodr:v1 niket50/hodr:latest"
-                                sh "docker push niket50/hodr:latest"
-                            }
-                        }
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
+                        sh "docker build -t niket50/hodr:${BUILD_NUMBER} ."
+                        sh "docker push niket50/hodr:${BUILD_NUMBER}"
                     }
                 }
+            }
+        }
 
         stage("TRIVY") {
             steps {
@@ -57,9 +57,21 @@ pipeline {
             }
         }
 
-        stage('Deploy to container') {
+        stage('Update the manifest file') {
             steps {
-                sh 'kubectl apply -f Kubernetes/*'
+                script {
+                    def newBuildNumber = "${BUILD_NUMBER}"
+
+                    // Replace the image tag in hodr.yaml
+                    sh "sed -i 's/image: niket50\\/hodr:latest/image: niket50\\/hodr:${newBuildNumber}/' Kubernetes/hodr.yaml"
+
+                    // Commit and push the changes to Git (optional)
+                    gitAdd = sh(script: "git add Kubernetes/hodr.yaml", returnStatus: true)
+                    if (gitAdd == 0) {
+                        sh "git commit -m 'Update image tag to ${newBuildNumber}'"
+                        sh "git push origin main"
+                    }
+                }
             }
         }
     }
@@ -76,3 +88,4 @@ pipeline {
         }
     }
 }
+
