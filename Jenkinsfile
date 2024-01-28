@@ -57,7 +57,7 @@ pipeline {
             }
         }
 
-	stage('Update the manifest file') {
+stage('Update the manifest file') {
     steps {
         withCredentials([usernamePassword(credentialsId: 'github-ci', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
             script {
@@ -75,8 +75,6 @@ pipeline {
     }
 }
 
-
-
     post {
         always {
             emailext attachLog: true,
@@ -89,4 +87,3 @@ pipeline {
         }
     }
 }
-
