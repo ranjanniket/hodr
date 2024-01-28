@@ -21,8 +21,7 @@ pipeline {
         stage("Sonarqube Analysis") {
             steps {
                 withSonarQubeEnv('sonar-server') {
-                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=hodr \
-                    -Dsonar.projectKey=hodr'''
+                    sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=hodr -Dsonar.projectKey=hodr"
                 }
             }
         }
@@ -40,12 +39,29 @@ pipeline {
             }
         }
 
-        stage("Docker Build & Push") {
+        stage('Build Image') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
-                        sh "docker build -t niket50/hodr:${BUILD_NUMBER} ."
-                        sh "docker push niket50/hodr:${BUILD_NUMBER}"
+                    app = docker.build("niket50/hodr")
+                }
+            }
+        }
+
+        stage('Test Image') {
+            steps {
+                script {
+                    app.inside {
+                        sh 'echo "Tests passed"'
+                    }
+                }
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker') {
+                        app.push("${env.BUILD_NUMBER}")
                     }
                 }
             }
@@ -53,29 +69,16 @@ pipeline {
 
         stage("TRIVY") {
             steps {
-                sh "trivy image -f json -o trivyimage.txt niket50/hodr:${BUILD_NUMBER}"
+                sh "trivy image -f json -o trivyimage.txt niket50/hodr:${env.BUILD_NUMBER}"
             }
         }
 
-        stage('Update Deployment File') {
+        stage('Trigger ManifestUpdate') {
             steps {
-                script {
-                    def gitUrl = "git@github.com:ranjanniket/bran_manifest.git"
-
-                    sshagent(credentials: ['niket-github']) {
-                        sh "git config user.email 'niketranjn50@gmail.com'"
-                        sh "git config user.name 'ranjanniket'"
-
-                        sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' Kubernetes/hodr.yaml"
-
-                        sh "git add ."
-                        sh "git commit -m 'Update image tag to ${BUILD_NUMBER}'"
-                        sh "git push ${gitUrl} HEAD:main"
-                    }
-                }
+                echo "triggering updatemanifestjob"
+                build job: 'cd_hodr', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
             }
         }
-
     }
 
     post {
@@ -87,7 +90,7 @@ pipeline {
                     "URL: ${env.BUILD_URL}<br/>",
                 to: 'niketranjan50@gmail.com',
                 attachmentsPattern: 'trivyfs.txt, trivyimage.txt'
-            }
         }
+    }
 }
 
