@@ -57,12 +57,25 @@ pipeline {
             }
         }
 
-        stage('Trigger ManifestUpdate') {
+        stage('Update Deployment File') {
             steps {
-                echo "triggering updatemanifest hodr job"
-                build job: "cd_hodr", parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)], wait: true
+                withCredentials([usernamePassword(credentialsId: 'ranjanniket', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    script {
+                        def gitUrl = 'https://github.com/ranjanniket/hodr.git'
+
+                        sh "git config user.email 'niketranjn50@gmail.com'"
+                        sh "git config user.name 'Niket Ranjan'"
+
+                        sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${NEW_BUILD_NUMBER}/' Kubernetes/hodr.yaml"
+
+                        sh "git add ."
+                        sh "git commit -m 'Update image tag to ${NEW_BUILD_NUMBER}'"
+                        sh "git push ${gitUrl} HEAD:main"
+                    }
+                }
             }
         }
+
     }
 
     post {
