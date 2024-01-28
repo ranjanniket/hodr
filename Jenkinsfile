@@ -66,10 +66,10 @@ pipeline {
                         sh "git config user.email 'niketranjn50@gmail.com'"
                         sh "git config user.name 'Niket Ranjan'"
 
-                        sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${NEW_BUILD_NUMBER}/' Kubernetes/hodr.yaml"
+                        sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' Kubernetes/hodr.yaml"
 
                         sh "git add ."
-                        sh "git commit -m 'Update image tag to ${NEW_BUILD_NUMBER}'"
+                        sh "git commit -m 'Update image tag to ${BUILD_NUMBER}'"
                         sh "git push ${gitUrl} HEAD:main"
                     }
                 }
