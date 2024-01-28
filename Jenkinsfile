@@ -61,10 +61,10 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'ranjanniket', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                     script {
-                        def gitUrl = 'https://github.com/ranjanniket/hodr.git'
+                        def gitUrl = "https://${GIT_PASSWORD}@github.com/ranjanniket/hodr_manifest.git"
 
                         sh "git config user.email 'niketranjn50@gmail.com'"
-                        sh "git config user.name 'Niket Ranjan'"
+                        sh "git config user.name 'ranjanniket'"
 
                         sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' Kubernetes/hodr.yaml"
 
