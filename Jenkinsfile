@@ -77,21 +77,20 @@ pipeline {
         }
 
         stage('Update Deployment File') {
-        steps {
-            script {
-                
-                withCredentials([usernamePassword(credentialsId: 'ranjanniket', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    sh "cat Kubernetes/hodr.yaml"
-                    sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' Kubernetes/hodr.yaml"
-                    sh "cat Kubernetes/hodr.yaml"  
-                    sh "git add Kubernetes/hodr.yaml"
-                    sh "git commit -m 'Update image tag to ${BUILD_NUMBER}'"
-                    sh "git remote -v"
-                    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/ranjanniket/hodr_manifest.git HEAD:main"
-                }
+    steps {
+        script {
+            withCredentials([usernamePassword(credentialsId: 'ranjanniket', passwordVariable: 'GIT_ACCESS_TOKEN', usernameVariable: '')]) {
+                sh "cat Kubernetes/hodr.yaml"
+                sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' Kubernetes/hodr.yaml"
+                sh "cat Kubernetes/hodr.yaml"  
+                sh "git add Kubernetes/hodr.yaml"
+                sh "git commit -m 'Update image tag to ${BUILD_NUMBER}'"
+                sh "git remote -v"
+                sh "git push https://${GIT_ACCESS_TOKEN}@github.com/ranjanniket/hodr_manifest.git HEAD:main"
             }
         }
     }
+}
 
 
 
