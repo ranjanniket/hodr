@@ -86,7 +86,7 @@ stage('Update Deployment File') {
                 sh "cat Kubernetes/hodr.yaml"
                 sh "git add Kubernetes/hodr.yaml"
                 sh "git commit -m 'Update image tag to ${BUILD_NUMBER}'"
-                sh "git remote set-url origin git@github.com:ranjanniket/hodr_manifest.git" // Use SSH instead of HTTPS
+                sh "git remote set-url origin git@github.com:ranjanniket/hodr_manifest.git"
                 sh "git push origin HEAD:main"
             }
         }
