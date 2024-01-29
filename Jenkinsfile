@@ -87,7 +87,7 @@ pipeline {
                     sh "git add Kubernetes/hodr.yaml"
                     sh "git commit -m 'Update image tag to ${BUILD_NUMBER}'"
                     sh "git remote -v"
-                    sh "git push https://github.com/ranjanniket/hodr_manifest.git HEAD:main"
+                    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/ranjanniket/hodr_manifest.git HEAD:main"
                 }
             }
         }
