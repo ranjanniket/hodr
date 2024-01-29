@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+	GITHUB_TOKEN = credentials('ranjanniket')
         SCANNER_HOME = tool 'sonar-scanner'
     }
 
