@@ -72,6 +72,7 @@ pipeline {
             steps {
                 script {
                     sh 'git clone git@github.com:ranjanniket/hodr_manifest.git'
+                    sh 'pwd'
                 }
             }
         }
@@ -80,6 +81,7 @@ pipeline {
             steps {
                 script {
                     sh 'cd hodr_manifest'
+                    sh 'pwd'
                     sh 'cat deployment.yaml'
                     sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' deployment.yaml"
                     sh 'cat deployment.yaml'
