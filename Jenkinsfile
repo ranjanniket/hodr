@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        GITHUB_TOKEN = credentials('ranjanniket')
         SCANNER_HOME = tool 'sonar-scanner'
     }
 
@@ -69,31 +68,29 @@ pipeline {
             }
         }
 
-        stage('Checkout K8S manifest SCM') {
-    steps {
-        git credentialsId: 'ranjanniket',
-        url: 'https://github.com/ranjanniket/hodr_manifest.git',
-        branch: 'main'
-    }
-}
-
-stage('Update Deployment File') {
-        steps {
-            script {
-                
-                withCredentials([usernamePassword(credentialsId: 'ranjanniket', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    sh "cat Kubernetes/hodr.yaml"
-                    sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' Kubernetes/hodr.yaml"
-                    sh "cat Kubernetes/hodr.yaml"  
-                    sh "git add Kubernetes/hodr.yaml"
-                    sh "git commit -m 'Update image tag to ${BUILD_NUMBER}'"
-                    sh "git remote -v"
-                    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/ranjanniket/hodr_manifest.git HEAD:main"
+        stage('Clone Manifest Repository') {
+            steps {
+                script {
+                    sh 'git clone git@github.com:ranjanniket/hodr_manifest.git'
                 }
             }
         }
-    }
 
+        stage('Update Deployment File') {
+            steps {
+                script {
+                    sh 'cd hodr_manifest'
+                    sh 'cat Kubernetes/hodr.yaml'
+                    sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' Kubernetes/hodr.yaml"
+                    sh 'cat Kubernetes/hodr.yaml'
+                    sh 'git add Kubernetes/hodr.yaml'
+                    sh "git commit -m 'Update image tag to ${BUILD_NUMBER}'"
+                    sh 'git remote -v'
+                    sh 'git push origin main'
+                }
+            }
+        }
+        
     }
 
     post {
