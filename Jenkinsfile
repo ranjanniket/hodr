@@ -79,8 +79,7 @@ pipeline {
         stage('Update Deployment File') {
         steps {
             script {
-                def gitUrl = "https://ranjanniket:${GITHUB_TOKEN}@github.com/ranjanniket/bran_manifest.git"
-
+                
                 withCredentials([usernamePassword(credentialsId: 'ranjanniket', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     sh "cat Kubernetes/hodr.yaml"
                     sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' Kubernetes/hodr.yaml"
@@ -88,7 +87,7 @@ pipeline {
                     sh "git add Kubernetes/hodr.yaml"
                     sh "git commit -m 'Update image tag to ${BUILD_NUMBER}'"
                     sh "git remote -v"
-                    sh "git push ${gitUrl} HEAD:main"
+                    sh "git push https://github.com/ranjanniket/hodr_manifest.git HEAD:main"
                 }
             }
         }
