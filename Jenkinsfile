@@ -68,31 +68,29 @@ pipeline {
             }
         }
 
-        stage('Checkout K8S manifest SCM'){
-            steps {
-                git credentialsId: 'ranjanniket', 
-                url: 'https://github.com/ranjanniket/hodr_manifest.git',
-                branch: 'main'
-            }
+        stage('Checkout K8S manifest SCM') {
+        steps {
+            git credentialsId: 'ranjanniket',
+            url: 'https://github.com/ranjanniket/hodr_manifest.git',
+            branch: 'main'
+        }
         }
 
         stage('Update Deployment File') {
-    steps {
-        script {
-            withCredentials([usernamePassword(credentialsId: 'ranjanniket', passwordVariable: 'GIT_ACCESS_TOKEN', usernameVariable: '')]) {
+        steps {
+            withCredentials([usernamePassword(credentialsId: 'ranjanniket', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+            script {
                 sh "cat Kubernetes/hodr.yaml"
                 sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' Kubernetes/hodr.yaml"
-                sh "cat Kubernetes/hodr.yaml"  
+                sh "cat Kubernetes/hodr.yaml"
                 sh "git add Kubernetes/hodr.yaml"
                 sh "git commit -m 'Update image tag to ${BUILD_NUMBER}'"
-                sh "git remote -v"
-                sh "git push https://${GIT_ACCESS_TOKEN}@github.com/ranjanniket/hodr_manifest.git HEAD:main"
+                sh "git remote set-url origin git@github.com:ranjanniket/hodr_manifest.git" 
+                sh "git push origin HEAD:main"
+            }
             }
         }
-    }
-}
-
-
+        }
 
     }
 
