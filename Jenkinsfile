@@ -80,10 +80,10 @@ pipeline {
             steps {
                 script {
                     sh 'cd hodr_manifest'
-                    sh 'cat Kubernetes/hodr.yaml'
-                    sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' Kubernetes/hodr.yaml"
-                    sh 'cat Kubernetes/hodr.yaml'
-                    sh 'git add Kubernetes/hodr.yaml'
+                    sh 'cat deployment.yaml'
+                    sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' deployment.yaml"
+                    sh 'cat deployment.yaml'
+                    sh 'git add deployment.yaml'
                     sh "git commit -m 'Update image tag to ${BUILD_NUMBER}'"
                     sh 'git remote -v'
                     sh 'git push origin main'
