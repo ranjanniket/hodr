@@ -72,17 +72,19 @@ pipeline {
         stage('Clone & Update Deployment File') {
             steps {
                 script {
-                    sh 'git clone git@github.com:ranjanniket/hodr_manifest.git'
-                    sh 'cd hodr_manifest'
-                    sh 'pwd' 
-                    sh 'ls'  
-                    sh 'cat deployment.yaml'
-                    sh "sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' deployment.yaml"
-                    sh 'cat deployment.yaml'
-                    sh 'git add deployment.yaml'
-                    sh "git commit -m 'Update image tag to ${BUILD_NUMBER}'"
-                    sh 'git remote -v'
-                    sh 'git push origin main'         
+                    sh '''
+                        git clone git@github.com:ranjanniket/hodr_manifest.git
+                        cd hodr_manifest/
+                        pwd
+                        ls
+                        cat deployment.yaml
+                        sed -i 's/niket50\\/hodr:.*/niket50\\/hodr:${BUILD_NUMBER}/' deployment.yaml
+                        cat deployment.yaml
+                        git add deployment.yaml
+                        git commit -m 'Update image tag to ${BUILD_NUMBER}'
+                        git remote -v
+                        git push origin main
+                    '''      
                 }
             }
         }
